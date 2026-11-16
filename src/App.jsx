@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Routes,
   Route,
@@ -6,6 +6,7 @@ import {
   NavLink,
   Link,
   Outlet,
+  useLocation,
   useParams,
 } from 'react-router-dom'
 import { collections, findEntry } from './lib/content'
@@ -45,7 +46,7 @@ function Layout() {
         </h1>
         <p className="dateline">
           {/* richard. broadcasting. {new Date().getFullYear()}. */}
-          and aeio is writing things
+          scratch! scribble! jot!
         </p>
 
         <nav className={`nav ${done ? 'in' : ''}`} aria-label="sections">
@@ -68,7 +69,7 @@ function Layout() {
       </section>
 
       <footer className="colophon">
-        <span>scratch! scribble! jot!</span>
+        {/* <span>scratch! scribble! jot!</span> */}
       </footer>
     </main>
   )
@@ -137,7 +138,24 @@ function EntryPage() {
   )
 }
 
+// count.js auto-counts the first load; this counts client-side route changes
+// after it. Skip the first run so the landing pageview isn't double-counted.
+function usePageviews() {
+  const location = useLocation()
+  const first = useRef(true)
+  useEffect(() => {
+    if (first.current) {
+      first.current = false
+      return
+    }
+    window.goatcounter?.count?.({
+      path: location.pathname + location.search + location.hash,
+    })
+  }, [location])
+}
+
 export default function App() {
+  usePageviews()
   return (
     <Routes>
       <Route element={<Layout />}>
